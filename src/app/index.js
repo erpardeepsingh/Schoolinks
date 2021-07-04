@@ -1,117 +1,112 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import ProfileLink from "../components/profileLink";
+import Dropdown from "../components/Dropdown";
+import Loader from "../components/Loader";
+import debounce from "../utils/debounce";
+
+let cached_results = [];
+let title = "",
+  page_c;
 
 export default function Index() {
-  const [title, setTitle] = useState("");
   const [result, setResult] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  let movie = [
-    
-  ];
+  let callApi = debounce((e, page) => {
+    title = e;
 
-  useEffect(() => {
-    setTitle("");
-  }, []);
-
-  function callApi() {
-    setLoading(true);
-    setError(false);
-    setResult({});
-    fetch(`http://www.omdbapi.com/?apikey=922db138&t="${title}"`)
-      .then((res) => res.json())
-      .then((res) => {
-        setLoading(false);
-        if (res.Error) setError(true);
-        else{
-           setResult(res);
-           movie.push({
-             movie: title,
-             result: res
-           });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
-  }
+    const if_already_contains = cached_results.filter((ele) => ele.title === e);
+    if (if_already_contains.length > 0 && page === page_c) {
+      setResult(if_already_contains[if_already_contains.length - 1].result);
+    } else {
+      if (if_already_contains.length === 0) setResult({});
+      page_c = page;
+      setLoading(true);
+      setError(false);
+      fetch(`https://api.github.com/search/users?q="${e}"&page=${page}`)
+        .then((res) => res.json())
+        .then((res) => {
+          setLoading(false);
+          if (res.Error) setError(true);
+          else {
+            if (if_already_contains.length > 0) {
+              let new_result = {
+                ...if_already_contains[if_already_contains.length - 1].result,
+                items: if_already_contains[
+                  if_already_contains.length - 1
+                ].result.items.concat(res.items),
+              };
+              setResult(new_result);
+              cached_results.push({
+                title: e,
+                result: new_result,
+              });
+            } else {
+              cached_results.push({
+                title: e,
+                result: res,
+              });
+              setResult(res);
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          setError(true);
+        });
+    }
+  }, 500);
 
   return (
-    <div>
-      <div className="sticky-top-desktop">
+    <div className="root-div">
+      <Dropdown
+        position="-110px"
+        color="transparent"
+        top={"60px"}
+        left="0px"
+        width="378px"
+        height={!loading && cached_results.length === 0 ? "0px" : "386px"}
+        boxShadow="0 8px 20px 0 rgba(0, 0, 0, 0.08)"
+        border="solid 1px rgba(34, 33, 51, 0.04)"
+        backgroundColor="#ffffff"
+        menuChildren={
+          <>
+            {result.total_count > 0 && result.items && (
+              <div className="scrollbar">
+                {result.items.map((user) => (
+                  <ProfileLink data={user} />
+                ))}
+                {result.items.length < result.total_count && (
+                  <a
+                    onClick={(e) => {
+                      callApi(title, page_c + 1);
+                    }}
+                    className="center"
+                  >
+                    Next
+                  </a>
+                )}
+              </div>
+            )}
+            {loading && <Loader />}
+            {error && <div className="center">Sorry Some Error Occurred</div>}
+            {!loading && title.length > 0 && result.total_count === 0 && (
+              <div className="center">Sorry No Results</div>
+            )}
+          </>
+        }
+      >
         <input
           type="text"
+          placeholder="Search.."
+          id="myInput"
           onChange={(e) => {
-            setTitle(e.target.value);
+            callApi(e.target.value, 1);
           }}
-          value={title}
         />
-        <button
-          onClick={() => {
-            if (title.length > 0 && !loading){
-              
-               callApi();
-            }
-            else if (title.length === 0)
-            alert("Title Cannot be empty");
-          }}
-        >
-          {" "}
-          Search{" "}
-        </button>
-      </div>
-      {error ? (
-        <span>Movie Not Found</span>
-      ) : result.Title ? (
-        <div style={{
-          margin: '50px'
-        }}>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Title: {result.Title} </div>
-          <div>Year Released: {new Date(result.Released).getFullYear()}</div>
-          <div>Plot: {result.Plot}</div>
-          <ul>
-            Generes:
-            {result.Genre &&
-              result.Genre.split(",").map((ele) => <li>{ele}</li>)}
-          </ul>
-        </div>
-      ) : (
-        <div>
-          {title.length > 0 && loading
-            ? "Loading"
-            : "Please enter the title and click Search"}
-        </div>
-      )}
+      </Dropdown>
     </div>
   );
 }

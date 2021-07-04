@@ -1,0 +1,16 @@
+.avatar {
+  width: 50px;
+  height: 50px;
+  background-size: contain;
+  border-radius: 50%;
+}
+
+.link-github{
+    display: grid;
+    grid-template-columns: 70px auto;
+    align-items: center;
+}
+
+.link-github:hover{
+    color: blue;
+}
