@@ -79,21 +79,21 @@ export default function Index() {
                   <ProfileLink data={user} />
                 ))}
                 {result.items.length < result.total_count && (
-                  <a
+                  <div
                     onClick={(e) => {
                       callApi(title, page_c + 1);
                     }}
-                    className="center"
+                    className="center link-github"
                   >
                     Next
-                  </a>
+                  </div>
                 )}
               </div>
             )}
             {loading && <Loader />}
             {error && <div className="center">Sorry Some Error Occurred</div>}
             {!loading && title.length > 0 && result.total_count === 0 && (
-              <div className="center">Sorry No Results</div>
+              <div className="center ">Sorry No Results</div>
             )}
           </>
         }

@@ -14,7 +14,7 @@
     z-index: 1;
   }
   
-  .dropdown-content a {
+  .link-github{
     text-align: initial;
     padding-left: 36px;
     text-decoration: none;
@@ -28,7 +28,7 @@
     color: #5f5f79;
   }
   
-  .dropdown a:hover {
+  .link-github:hover {
     background-color: rgba(65, 65, 91, 0.05);
     cursor: pointer;
     color: #73aaf8;
